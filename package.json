@@ -8,14 +8,14 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/toptensoftware/layers.core"
+    "url": "https://github.com/toptensoftware/layers-core"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
     "@elgato-stream-deck/node": "^7.5.2",
-    "@toptensoftware/layers.core": "github:toptensoftware/layers-core",
+    "@toptensoftware/layers-core": "github:toptensoftware/layers-core",
     "@toptensoftware/node-buttonImage": "github:toptensoftware/node-buttonImage",
     "sharp": "^0.34.5"
   }

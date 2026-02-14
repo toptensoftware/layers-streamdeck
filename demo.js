@@ -1,4 +1,4 @@
-import { Layer } from "@toptensoftware/layers.core";
+import { Layer } from "@toptensoftware/layers-core";
 
 import { openStreamDeck, listStreamDecks } from '@elgato-stream-deck/node'
 import { StreamDeckManager } from "./streamdeck.js";

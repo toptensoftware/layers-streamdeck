@@ -1,11 +1,11 @@
-# layers.streamdeck
+# layers-streamdeck
 
 StreamDeck support for @toptensoftware/layers
 
 ## Installation
 
 ```
-npm install --save toptensoftware/layers.streamdeck
+npm install --save toptensoftware/layers-streamdeck
 ```
 
 
