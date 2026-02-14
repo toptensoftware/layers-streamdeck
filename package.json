@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "@elgato-stream-deck/node": "^7.5.2",
+    "@toptensoftware/layers.core": "github:toptensoftware/layers-core",
     "@toptensoftware/node-buttonImage": "github:toptensoftware/node-buttonImage",
     "sharp": "^0.34.5"
   }
