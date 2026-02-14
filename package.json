@@ -1,0 +1,21 @@
+{
+  "name": "@toptensoftware/layers-streamdeck",
+  "description": "StreamDeck support for @toptensoftware/layers",
+  "version": "1.0.0",
+  "main": "index.js",
+  "type": "module",
+  "author": "Topten Software",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/toptensoftware/layers.core"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@elgato-stream-deck/node": "^7.5.2",
+    "@toptensoftware/node-buttonImage": "github:toptensoftware/node-buttonImage",
+    "sharp": "^0.34.5"
+  }
+}
