@@ -22,8 +22,10 @@ export class StreamDeckManager
 
     setButton(buttonIndex, handler)
     {
+        let old = this.buttonHandlers[buttonIndex];
         this.buttonHandlers[buttonIndex] = handler;
         this.invalidate(buttonIndex);
+        return old;
     }
 
     invalidate(buttonIndex)
@@ -158,15 +160,19 @@ export class StreamDeckButton
             return null;
     }
 
+    #old = null;
     onActivate()
     {
-        this.manager.setButton(this.buttonIndex, this);
+        if (this.buttonIndex == 14)
+            debugger;
+        this.#old = this.manager.setButton(this.buttonIndex, this);
     }
 
     onDeactivate()
     {
-        this.manager.setButton(this.buttonIndex, null);
+        this.manager.setButton(this.buttonIndex, this.#old);
         this.isPressed = false;
+        this.#old = null;
     }
 
 }
