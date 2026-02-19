@@ -26,7 +26,7 @@ const sd = await openStreamDeck(devices[0].path)
 Create StreamDeckManager:
 
 ```js
-import { StreamDeckManager } from "./streamdeck.js";
+import { StreamDeckManager } from "@toptensoftware/layers-streamdeck";
 
 let sdm = new StreamDeckManager(sd);
 ```
@@ -47,6 +47,47 @@ layer.add(sdm.button({
         console.log("Button Press"),
     }
 }));
+```
+
+Alternatively, create your own button class by deriving from `StreamDeckButton`:
+
+```js
+import { StreamDeckButton } from "@toptensoftware/layers-streamdeck";
+
+class MyCustomButton extends StreamDeckButton
+{
+    constructor(manager)
+    {
+        super({
+            // Button options as above
+        });
+
+        // Or, assign directly
+        this.buttonIndex = 1;
+        this.image = { /*...*/ };
+
+        // Connect to manager
+        this.manager = manager;
+    }
+
+    press(ev)
+    {
+        console.log(ev);
+    }
+
+    release(ev)
+    {
+        console.log(ev);
+    }
+
+    // Other overrides:
+    // async render(width, height) { return a rendered image for fillKeyBuffer }
+    // onActivate(); // called by layer core when activated
+    // onDeactivate(); // called by layer core when deactivate
+}
+
+layer.add(new MyCustomButton(sdm));
+
 ```
 
 ## Button Settings
@@ -105,7 +146,7 @@ layer.add(sdm.button({
         this.image.state = "";
     },
 
-    // Called when button long-press (omit handler to disable long press)
+    // Called when button long-press (omit handler to disable long press functionality)
     longPress(ev)
     {
         console.log("LONG PRESS", ev);

@@ -139,12 +139,6 @@ export class StreamDeckButton
     {
         Object.assign(this, options);
 
-        // Wrap 'image' property in button image renderer
-        if (this.image && this.image.render === undefined)
-        {
-            this.image = new ButtonImage(options.image);
-        }
-
         this.image.onInvalidate = () => this.invalidate();
     }
 
@@ -156,6 +150,22 @@ export class StreamDeckButton
     #autoPressImage = null;
     #repeatTimer = null;
     #longPressTimer = null;
+    #image = null;
+
+    get image()
+    {
+        return this.#image;
+    }
+
+    set image(value)
+    {
+        // Wrap 'image' property in button image renderer
+        if (value && value.render === undefined)
+        {
+            value = new ButtonImage(value);
+        }
+        this.#image = value;
+    }
 
     invalidate()
     {
