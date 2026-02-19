@@ -16,10 +16,10 @@ let layer = new Layer();
 
 layer.add(sdm.button({
 
-    buttonIndex: 14,
+    buttonIndex: 0,
 
     image: {
-        svgFile: "#apple-tv",
+        svgFile: "#heart",
         svgForeColor: "red",
         states: {
             "pressed": {
@@ -27,6 +27,8 @@ layer.add(sdm.button({
             }
         }
     },
+
+    repeat: { initialDelay: 1000, period: 50 },
 
     //autoPressEffect: true,
 
@@ -40,7 +42,15 @@ layer.add(sdm.button({
     {
         console.log(ev);
         this.image.state = "";
-    }
+    },
+
+    longPress(ev)
+    {
+        console.log("LONG PRESS", ev);
+    },
+
+    repeat: 100,
+    longPressDelay: 2000
 
 }));
 

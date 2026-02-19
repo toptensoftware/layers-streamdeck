@@ -12,19 +12,69 @@ export class StreamDeckManager
         this.device.on('up', (key) => this.#onButton(key, false));
     }
 
+    #pressedButtons = new Set();
+    #suppressButtonUp = new Set();
+
     #onButton(key, down)
     {
-        let handler = this.buttonHandlers[key.index];
-        if (!handler)
-            return;
-        handler.input({ buttonIndex: key.index, press: down });
+        try
+        {
+            // Track pressed buttons
+            if (down)
+                this.#pressedButtons.add(key.index);
+            else
+                this.#pressedButtons.delete(key.index);
+
+            // Is button up suppressed?
+            if (!down && this.#suppressButtonUp.has(key.index))
+            {
+                this.#suppressButtonUp.delete(key.index);
+                return;
+            }
+
+            // Find handler
+            let handler = this.buttonHandlers[key.index];
+            if (!handler)
+                return;
+
+            // Call handler
+            handler.input({ buttonIndex: key.index, press: down });
+        }
+        catch (err)
+        {
+            console.log("Unhandled exception in StreamDeck event handler:", err);
+        }
+
+    }
+
+    // Suppress next button up for a button
+    // (Used for long press detection and when replacing button that's held)
+    suppressButtonUp(buttonIndex)
+    {
+        this.#suppressButtonUp.add(buttonIndex);
     }
 
     setButton(buttonIndex, handler)
     {
+        // Remember old handler
         let old = this.buttonHandlers[buttonIndex];
+        if (handler == old)
+            return old;
+
+        // If the button being replaced is currently pressed
+        // then ignore the next button up.
+        if (this.#pressedButtons.has(buttonIndex))
+        {
+            this.#suppressButtonUp.add(buttonIndex);
+        }
+
+        // Store new handler
         this.buttonHandlers[buttonIndex] = handler;
+
+        // Repaint
         this.invalidate(buttonIndex);
+
+        // Return old handler
         return old;
     }
 
@@ -104,6 +154,8 @@ export class StreamDeckButton
 
     autoPressEffect = true;
     #autoPressImage = null;
+    #repeatTimer = null;
+    #longPressTimer = null;
 
     invalidate()
     {
@@ -114,10 +166,59 @@ export class StreamDeckButton
     input(ev)
     {
         this.isPressed = ev.press;
+        ev.repeat = false;
+
         if (ev.press)
+        {
             this.press?.(ev);
+        }
         else
+        {
             this.release?.(ev);
+            this.#clearTimers();
+        }
+
+        if (ev.press && this.repeat)
+        {
+            // Work out repeat delay and period
+            let period = 100;
+            let initialDelay = 500;
+
+            if (typeof(this.repeat) === 'number')
+            {
+                period = this.repeat;
+                initialDelay = this.repeat;
+            }
+            else if (typeof(this.repeat) === 'object')
+            {
+                period = this.repeat.period;
+                initialDelay = this.repeat.initialDelay ?? this.repeat.period;
+            }
+
+            let timerCallback = () => {
+                ev.repeat = true;
+                this.press?.(ev);
+            };
+
+            let initialCallback = () => {
+                this.#repeatTimer = setInterval(timerCallback, period);
+                timerCallback();
+            };
+
+            if (period == initialDelay)
+                this.#repeatTimer = setInterval(timerCallback, period);
+            else
+                this.#repeatTimer = setTimeout(initialCallback, initialDelay);
+        }
+
+        if (ev.press && this.longPress !== undefined)
+        {
+            this.#longPressTimer = setTimeout(() => {
+                this.#clearTimers();
+                this.manager.suppressButtonUp(this.buttonIndex);
+                this.longPress(ev);
+            }, this.longPressDelay ?? 500);
+        }
 
         if (this.autoPressEffect)
             this.manager?.invalidate(this.buttonIndex)
@@ -141,13 +242,14 @@ export class StreamDeckButton
                     }
                 });
                     
+                const effectSize = parseInt(width *.12);
                 img = clone
-                    .resize(width - 6, height - 6, { kernel: 'lanczos3' })
+                    .resize(width - effectSize * 2, height - effectSize * 2, { kernel: 'lanczos3' })
                     .extend({
-                        top: 3,
-                        bottom: 3,
-                        left: 3,
-                        right: 3,
+                        top: effectSize,
+                        bottom: effectSize,
+                        left: effectSize,
+                        right: effectSize,
                         background: { r: 0, g: 0, b: 0, alpha: 1 }
                     })
                     .removeAlpha().raw().toBuffer(); 
@@ -160,11 +262,17 @@ export class StreamDeckButton
             return null;
     }
 
+    #clearTimers()
+    {
+        clearInterval(this.#repeatTimer);
+        this.#repeatTimer = null;
+        clearInterval(this.#longPressTimer);
+        this.#longPressTimer = null;
+    }
+
     #old = null;
     onActivate()
     {
-        if (this.buttonIndex == 14)
-            debugger;
         this.#old = this.manager.setButton(this.buttonIndex, this);
     }
 
@@ -173,6 +281,7 @@ export class StreamDeckButton
         this.manager.setButton(this.buttonIndex, this.#old);
         this.isPressed = false;
         this.#old = null;
+        this.#clearTimers();
     }
 
 }
