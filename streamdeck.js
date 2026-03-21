@@ -54,6 +54,14 @@ export class StreamDeckManager
         this.#suppressButtonUp.add(buttonIndex);
     }
 
+    mapButtonIndex(coords)
+    {
+        let button = this.device.CONTROLS.find(x => x.column == coords[0] && x.row == coords[1]);
+        if (!button)
+            throw new Error("No button", corrds);
+        return button.index;
+    }
+
     setButton(buttonIndex, handler)
     {
         // Remember old handler
@@ -142,7 +150,20 @@ export class StreamDeckButton
         this.image.onInvalidate = () => this.invalidate();
     }
 
-    manager = null;
+    #manager;
+    get manager()
+    {
+        return this.#manager;
+    }
+    set manager(value)
+    {
+        this.#manager = value;
+        if (value && Array.isArray(this.buttonIndex))
+        {
+            this.buttonIndex = value.mapButtonIndex(this.buttonIndex);
+        }
+    }
+        
 
     isPressed = false;
 
