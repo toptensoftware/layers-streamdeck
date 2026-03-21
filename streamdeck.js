@@ -183,6 +183,19 @@ export class StreamDeckButton
         // Wrap 'image' property in button image renderer
         if (value && value.render === undefined)
         {
+            if (true)
+            {
+                if (value.svgFile)
+                {
+                    value.text = value.svgFile;
+                    value.svgFile = null;
+                    if (value.text.startsWith("#"))
+                        value.text = value.text.substring(1);
+                    value.text = value.text.substring(0, 6);
+                }
+                value.textColor = "orange";
+            }
+
             value = new ButtonImage(value);
         }
         this.#image = value;
