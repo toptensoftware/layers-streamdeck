@@ -183,7 +183,7 @@ export class StreamDeckButton
         // Wrap 'image' property in button image renderer
         if (value && value.render === undefined)
         {
-            if (true)
+            if (false)
             {
                 if (value.svgFile)
                 {
