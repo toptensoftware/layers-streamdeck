@@ -15,10 +15,29 @@ export class StreamDeckManager
     #pressedButtons = new Set();
     #suppressButtonUp = new Set();
 
+    #activityHook = null;
+    setActivityHook(hook)
+    {
+        this.#activityHook = hook;
+    }
+
     #onButton(key, down)
     {
         try
         {
+            // Setup event
+            let ev = { buttonIndex: key.index, press: down };
+
+            // Call activity hook
+            if (down && this.#activityHook)
+            {
+                if (this.#activityHook(ev))
+                {
+                    this.#suppressButtonUp.add(key.index)
+                    return;
+                }
+            }
+
             // Track pressed buttons
             if (down)
                 this.#pressedButtons.add(key.index);
@@ -38,7 +57,7 @@ export class StreamDeckManager
                 return;
 
             // Call handler
-            handler.input({ buttonIndex: key.index, press: down });
+            handler.input(ev);
         }
         catch (err)
         {
