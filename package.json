@@ -1,7 +1,7 @@
 {
   "name": "@toptensoftware/layers-streamdeck",
   "description": "StreamDeck support for @toptensoftware/layers",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "main": "index.js",
   "type": "module",
   "author": "Topten Software",
