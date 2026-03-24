@@ -119,6 +119,7 @@ export class StreamDeckManager
     {
         let device = this.device;
         let promises = [];
+        let self = this;
         for (let buttonIndex of this.#invalidButtons)
         {
             // Find button
@@ -146,7 +147,9 @@ export class StreamDeckManager
             // Render image
             let image = await handler.render(width, height);
 
-            await device.fillKeyBuffer(buttonIndex, image)
+            // Make sure handler is still active then send the button image
+            if (self.buttonHandlers[buttonIndex] == handler)
+                await device.fillKeyBuffer(buttonIndex, image)
         }
     }
 
