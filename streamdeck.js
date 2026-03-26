@@ -168,8 +168,6 @@ export class StreamDeckButton
     constructor(options)
     {
         Object.assign(this, options);
-
-        this.image.onInvalidate = () => this.invalidate();
     }
 
     #manager;
@@ -220,7 +218,14 @@ export class StreamDeckButton
 
             value = new ButtonImage(value);
         }
+
+        if (this.#image)
+            this.#image.onInvalidate = null;
+
         this.#image = value;
+
+        if (this.#image)
+            this.#image.onInvalidate = () => this.invalidate();
     }
 
     invalidate()
